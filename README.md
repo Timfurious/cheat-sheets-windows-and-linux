@@ -61,8 +61,9 @@ Each cheat sheet is written in pure CLI (PowerShell or Bash), and includes:
 Just clone or download this repo:
 
 ```bash
-git clone https://github.com/yourusername/ctf-postexploitation-cheatsheets.git
+git clone https://github.com/Timfurious/cheat-sheets-windows-and-linux
 
+```
 ```windows powershell
 
-Invoke-WebRequest http://attacker.com/windows10_ctf_cheatsheet.txt -OutFile cheat.txt
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Timfurious/cheat-sheets-windows-and-linux/cheat/windows11_ctf_cheatsheet.txt" -OutFile "C:\Users\Public\cheat.txt"
