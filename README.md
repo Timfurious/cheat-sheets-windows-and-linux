@@ -62,3 +62,7 @@ Just clone or download this repo:
 
 ```bash
 git clone https://github.com/yourusername/ctf-postexploitation-cheatsheets.git
+
+```windows powershell
+
+Invoke-WebRequest http://attacker.com/windows10_ctf_cheatsheet.txt -OutFile cheat.txt
